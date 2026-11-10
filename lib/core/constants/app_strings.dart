@@ -17,6 +17,10 @@ abstract final class AppStrings {
   static const String navProduct = 'Produk';
   static const String navReport = 'Laporan';
   static const String navSettings = 'Pengaturan';
+  static const String cashierPlaceholderSubtitle = 'Area transaksi kasir dan keranjang belanja.';
+  static const String productPlaceholderSubtitle = 'Katalog produk, manajemen kategori, dan add-on.';
+  static const String reportPlaceholderSubtitle = 'Ringkasan laporan penjualan dan riwayat transaksi.';
+  static const String settingsPlaceholderSubtitle = 'Informasi sesi kasir dan pengaturan aplikasi.';
 
   // Quantity Stepper
   static const String decreaseQty = 'Kurang jumlah';

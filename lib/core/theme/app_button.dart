@@ -132,10 +132,14 @@ class AppButton extends StatelessWidget {
           leadingIcon!,
           const SizedBox(width: 8),
         ],
-        Text(
-          text,
-          style: textStyle,
-          textAlign: TextAlign.center,
+        Flexible(
+          child: Text(
+            text,
+            style: textStyle,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         if (!isLoading && trailingIcon != null) ...[
           const SizedBox(width: 8),
