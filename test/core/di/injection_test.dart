@@ -17,6 +17,8 @@ import 'package:vonte_pos/features/category/domain/usecases/delete_category.dart
 import 'package:vonte_pos/features/category/domain/usecases/get_categories.dart';
 import 'package:vonte_pos/features/category/domain/usecases/update_category.dart';
 import 'package:vonte_pos/features/category/presentation/cubit/category_cubit.dart';
+import 'package:vonte_pos/features/transaction/domain/usecases/get_report_use_case.dart';
+import 'package:vonte_pos/features/transaction/presentation/cubit/report_cubit.dart';
 
 void main() {
   tearDown(() async {
@@ -50,6 +52,9 @@ void main() {
 
       expect(getIt.isRegistered<GetAddonById>(), isTrue);
       expect(getIt.isRegistered<CartCubit>(), isTrue);
+
+      expect(getIt.isRegistered<GetReportUseCase>(), isTrue);
+      expect(getIt.isRegistered<ReportCubit>(), isTrue);
     });
 
     test('allows injecting custom AppDatabase instance', () async {

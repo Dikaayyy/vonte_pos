@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/result.dart';
@@ -10,11 +12,17 @@ import '../datasources/transaction_local_data_source.dart';
 class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionLocalDataSource _localDataSource;
   final InvoiceNumberGenerator _invoiceGenerator;
+  final _transactionCommittedController =
+      StreamController<Transaction>.broadcast();
 
   TransactionRepositoryImpl(
     this._localDataSource,
     this._invoiceGenerator,
   );
+
+  @override
+  Stream<Transaction> get onTransactionCommitted =>
+      _transactionCommittedController.stream;
 
   @override
   Future<Result<Transaction>> checkout(CheckoutParams params) async {
@@ -23,7 +31,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
         params: params,
         invoiceGenerator: _invoiceGenerator,
       );
-      return Result.success(model.toEntity());
+      final entity = model.toEntity();
+      _transactionCommittedController.add(entity);
+      return Result.success(entity);
     } on AppException catch (e) {
       return Result.failure(CheckoutFailure(e.message));
     } catch (e) {

@@ -15,5 +15,8 @@ abstract class TransactionRepository {
 
   /// Retrieves all transaction history snapshots.
   Future<List<Transaction>> getTransactions();
+
+  /// Broadcast stream notifying whenever a new transaction is committed to the database.
+  Stream<Transaction> get onTransactionCommitted => const Stream.empty();
 }
 

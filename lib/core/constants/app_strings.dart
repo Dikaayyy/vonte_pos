@@ -301,4 +301,18 @@ abstract final class AppStrings {
   static const String userSessionTitle = 'Sesi Kasir Aktif';
   static const String userSessionStartTime = 'Waktu Sesi Dimulai';
   static const String userIdLabel = 'ID Pengguna';
+
+  // Report & History Strings
+  static const String reportTitle = 'Laporan';
+  static const String reportSubtitle =
+      'Ringkasan performa penjualan dan riwayat transaksi.';
+  static const String totalRevenueLabel = 'Total Pendapatan';
+  static const String successfulTransactionsLabel = 'Transaksi Sukses';
+  static const String transactionHistoryTitle = 'Riwayat Transaksi';
+  static const String emptyTransactionsTitle = 'Belum ada transaksi';
+  static const String emptyTransactionsSubtitle =
+      'Riwayat penjualan akan muncul di sini setelah transaksi kasir berhasil.';
+  static const String refreshReport = 'Muat Ulang';
+  static const String loadReportFailed = 'Gagal memuat laporan transaksi.';
+  static const String transactionCountUnit = 'transaksi';
 }

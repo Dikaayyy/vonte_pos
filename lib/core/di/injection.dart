@@ -50,6 +50,8 @@ import '../../features/transaction/data/repositories/transaction_repository_impl
 import '../../features/transaction/domain/repositories/transaction_repository.dart';
 import '../../features/transaction/domain/services/invoice_number_generator.dart';
 import '../../features/transaction/domain/usecases/checkout_use_case.dart';
+import '../../features/transaction/domain/usecases/get_report_use_case.dart';
+import '../../features/transaction/presentation/cubit/report_cubit.dart';
 import '../database/app_database.dart';
 import '../storage/app_directory_provider.dart';
 
@@ -264,6 +266,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => CheckoutUseCase(getIt<TransactionRepository>()),
     );
   }
+  if (!getIt.isRegistered<GetReportUseCase>()) {
+    getIt.registerLazySingleton<GetReportUseCase>(
+      () => GetReportUseCase(getIt<TransactionRepository>()),
+    );
+  }
 
   // 5. Cubits (Factory)
   if (!getIt.isRegistered<AuthCubit>()) {
@@ -327,6 +334,14 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
     getIt.registerFactory<CheckoutCubit>(
       () => CheckoutCubit(
         checkoutUseCase: getIt<CheckoutUseCase>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<ReportCubit>()) {
+    getIt.registerFactory<ReportCubit>(
+      () => ReportCubit(
+        getReportUseCase: getIt<GetReportUseCase>(),
+        transactionRepository: getIt<TransactionRepository>(),
       ),
     );
   }

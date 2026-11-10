@@ -22,6 +22,8 @@ import '../../../../features/product/presentation/cubit/product_cubit.dart';
 import '../../../../features/product/presentation/pages/product_shell_page.dart';
 import '../../../../features/store_profile/presentation/cubit/store_profile_cubit.dart';
 import '../../../../features/store_profile/presentation/pages/settings_page.dart';
+import '../../../../features/transaction/presentation/cubit/report_cubit.dart';
+import '../../../../features/transaction/presentation/pages/report_page.dart';
 import '../widgets/floating_glass_bottom_bar.dart';
 
 /// AppShell hosts the primary 4 destinations after authentication:
@@ -44,7 +46,9 @@ class AppShell extends StatefulWidget {
     this.categoryCubit,
     this.addonCubit,
     this.cartCubit,
+    this.reportCubit,
     this.cashierChild,
+    this.reportChild,
   });
 
   static const String routeName = AppRoutes.home;
@@ -55,7 +59,9 @@ class AppShell extends StatefulWidget {
   final CategoryCubit? categoryCubit;
   final AddonCubit? addonCubit;
   final CartCubit? cartCubit;
+  final ReportCubit? reportCubit;
   final Widget? cashierChild;
+  final Widget? reportChild;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -87,7 +93,7 @@ class _AppShellState extends State<AppShell> {
     ),
   ];
 
-  late final List<Widget> _pages = [
+  List<Widget> _buildPages() => [
     Builder(
       builder: (ctx) {
         try {
@@ -100,7 +106,17 @@ class _AppShellState extends State<AppShell> {
       },
     ),
     const ProductShellPage(),
-    const ReportPlaceholderView(),
+    Builder(
+      builder: (ctx) {
+        try {
+          ctx.read<ReportCubit>();
+          return widget.reportChild ??
+              ReportPage(isActive: _currentIndex == 2);
+        } catch (_) {
+          return widget.reportChild ?? const ReportPlaceholderView();
+        }
+      },
+    ),
     SettingsPage(storeProfileCubit: widget.storeProfileCubit),
   ];
 
@@ -110,16 +126,21 @@ class _AppShellState extends State<AppShell> {
     _currentIndex = widget.initialIndex;
   }
 
-  void _onDestinationSelected(int index) {
+  void _onDestinationSelected(int index, [BuildContext? innerContext]) {
     if (_currentIndex == index) return;
     setState(() {
       _currentIndex = index;
     });
+    final effectiveContext = innerContext ?? context;
     if (index == 1) {
       try {
-        context.read<ProductCubit>().loadProducts();
-        context.read<CategoryCubit>().loadCategories();
-        context.read<AddonCubit>().loadAddons();
+        effectiveContext.read<ProductCubit>().loadProducts();
+        effectiveContext.read<CategoryCubit>().loadCategories();
+        effectiveContext.read<AddonCubit>().loadAddons();
+      } catch (_) {}
+    } else if (index == 2) {
+      try {
+        effectiveContext.read<ReportCubit>().loadReport();
       } catch (_) {}
     }
   }
@@ -139,13 +160,14 @@ class _AppShellState extends State<AppShell> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isExpanded = constraints.maxWidth >= AppSizes.expandedBreakpoint;
+          final pages = _buildPages();
 
           return Scaffold(
             backgroundColor: AppColors.background,
             body: isExpanded
                 ? Row(
                     children: [
-                      _buildNavigationRail(),
+                      _buildNavigationRail(context),
                       const VerticalDivider(
                         width: 1,
                         thickness: 1,
@@ -154,14 +176,14 @@ class _AppShellState extends State<AppShell> {
                       Expanded(
                         child: IndexedStack(
                           index: _currentIndex,
-                          children: _pages,
+                          children: pages,
                         ),
                       ),
                     ],
                   )
                 : IndexedStack(
                     index: _currentIndex,
-                    children: _pages,
+                    children: pages,
                   ),
             bottomNavigationBar: isExpanded
                 ? null
@@ -176,7 +198,7 @@ class _AppShellState extends State<AppShell> {
                       child: FloatingGlassBottomBar(
                         currentIndex: _currentIndex,
                         destinations: _destinations,
-                        onTap: _onDestinationSelected,
+                        onTap: (index) => _onDestinationSelected(index, context),
                       ),
                     ),
                   ),
@@ -242,6 +264,20 @@ class _AppShellState extends State<AppShell> {
       );
     }
 
+    if (widget.reportCubit != null) {
+      providers.add(
+        BlocProvider<ReportCubit>.value(
+          value: widget.reportCubit!..loadReport(),
+        ),
+      );
+    } else if (getIt.isRegistered<ReportCubit>()) {
+      providers.add(
+        BlocProvider<ReportCubit>(
+          create: (_) => getIt<ReportCubit>()..loadReport(),
+        ),
+      );
+    }
+
     if (providers.isNotEmpty) {
       return MultiBlocProvider(
         providers: providers,
@@ -252,14 +288,15 @@ class _AppShellState extends State<AppShell> {
     return content;
   }
 
-  Widget _buildNavigationRail() {
+  Widget _buildNavigationRail(BuildContext context) {
     return AppGlass(
       isStrong: true,
       borderRadius: BorderRadius.zero,
       child: NavigationRail(
         backgroundColor: Colors.transparent,
         selectedIndex: _currentIndex,
-        onDestinationSelected: _onDestinationSelected,
+        onDestinationSelected: (index) =>
+            _onDestinationSelected(index, context),
         labelType: NavigationRailLabelType.all,
         minWidth: 84,
         useIndicator: true,

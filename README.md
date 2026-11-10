@@ -36,7 +36,7 @@ lib/
 ## 2. State Management
 
 Menggunakan **Cubit** (`flutter_bloc`) dengan `equatable`:
-- Satu Cubit per kebutuhan domain (`AuthCubit`, `CategoryCubit`, `AddonCubit`, `ProductCubit`).
+- Satu Cubit per kebutuhan domain (`AuthCubit`, `CategoryCubit`, `AddonCubit`, `ProductCubit`, `CartCubit`, `CheckoutCubit`, `ReportCubit`).
 - State bersifat immutable, memiliki status eksplisit (`initial`, `loading`, `success`, `failure`), `copyWith`, dan `errorMessage` yang ramah pengguna.
 - Cubit hanya memanggil Use Case di lapisan domain (tidak memanggil database atau repository langsung).
 
@@ -84,13 +84,36 @@ Foreign keys diaktifkan pada koneksi (`PRAGMA foreign_keys = ON` di `onConfigure
 
 ---
 
-## 6. Pengujian & Verifikasi
+## 6. Tab Laporan & Riwayat Transaksi (Aturan 2: Immutability)
 
-Semua lapisan diuji dengan unit test dan widget test (224 test case passing):
-- `StoreProfileValidatorTest` & `StoreProfileCubitTest`: validasi input form dan alur state loading, success, failure, serta notifikasi.
-- `StoreProfileRepositoryImplTest`: integrasi database in-memory untuk simpan dan baca profil toko, verifikasi persistence, serta jaminan seeding tidak menggandakan data saat tabel sudah berisi.
-- `SettingsPageTest` & `AppShellTest`: widget test layar pengaturan, prefill data profil, validasi inline pesan error, dialog konfirmasi muat data contoh, dan dialog konfirmasi keluar.
-- Validasi domain produk, add-on, kategori, sistem foto offline, dan autentikasi.
+### A. Fitur Tab Laporan
+1. **Query Terisolasi**: Query laporan dan riwayat transaksi **hanya** mengakses tabel `transactions`, `transaction_items`, dan `transaction_item_addons`. Dilarang keras melakukan `JOIN` ke tabel master `products` maupun `addons`.
+2. **Kartu Statistik**: Menampilkan metrik utama di bagian atas menggunakan kartu solid `AppCard` sesuai `DESIGN.md`:
+   - **Total Pendapatan**: Akumulasi nilai `total` dari seluruh transaksi sukses dalam format rupiah (`formatRupiah`) dengan *tabular figures*.
+   - **Transaksi Sukses**: Jumlah total transaksi tercatat.
+3. **Daftar Riwayat Transaksi**:
+   - Menampilkan daftar transaksi terurut dari yang paling baru (`created_at DESC`).
+   - Setiap kartu transaksi menampilkan nomor invoice resmi, waktu transaksi, kasir, jumlah item, serta total nominal yang rata kanan.
+   - Tanpa efek blur (*strictly no BackdropFilter*) di dalam list scrolling sesuai aturan performa `DESIGN.md`.
+4. **Pratinjau Struk Snapshot**: Mengetuk (*tap*) salah satu baris riwayat akan membuka tampilan struk (`ReceiptPage` / `ReceiptView`) yang dibangun dari data snapshot murni, identik dengan struk sesaat setelah checkout.
+
+### B. Jaminan Immutability Riwayat Transaksi (Aturan 2)
+- **Snapshot Kolom**: Saat checkout berhasil, seluruh data penting (nama toko, alamat, telepon kasir, nama kasir, nama produk, harga satuan saat dibeli, add-on dan harganya, serta total baris) disalin sebagai snapshot ke dalam tabel transaksi.
+- **Kebal terhadap Perubahan Master Data**:
+  - Jika harga produk diubah di masa depan (misal: Rp18.000 naik menjadi Rp45.000), total pendapatan laporan dan harga pada nota riwayat lama **tetap sama persis** dengan saat transaksi dilakukan.
+  - Jika produk atau add-on dihapus (*soft delete* `is_deleted = 1`), riwayat transaksi dan struk lama **tetap dapat dimuat tanpa error atau null**, karena query tidak bergantung pada tabel produk.
+- Diuji secara menyeluruh melalui `transaction_immutability_integration_test.dart` (mencakup skenario saat belum ada transaksi dan skenario jual -> ubah harga -> soft delete -> muat ulang).
+
+---
+
+## 7. Pengujian & Verifikasi
+
+Semua lapisan diuji dengan unit test, bloc test, widget test, dan integration test (361 test case passing):
+- `GetReportUseCaseTest`: pengujian kalkulasi agregasi pendapatan dan total transaksi domain.
+- `ReportCubitTest`: pengujian alur state cubit (`loading`, `success`, `failure`) menggunakan `bloc_test`.
+- `ReportPageTest`: widget test layar laporan (state kosong, kartu statistik, daftar riwayat, ketuk transaksi buka struk, tombol muat ulang).
+- `TransactionImmutabilityIntegrationTest`: integrasi SQLite in-memory untuk memverifikasi kebalnya laporan dan struk terhadap perubahan harga atau penghapusan produk di master data.
+- Hard Rule 1 (Shared Stock Validation) & Hard Rule 4 (Discount & Cash Calculator).
 
 Jalankan pengujian:
 ```bash
