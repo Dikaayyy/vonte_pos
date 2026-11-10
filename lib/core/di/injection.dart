@@ -21,9 +21,11 @@ import '../../features/addon/data/repositories/addon_repository_impl.dart';
 import '../../features/addon/domain/repositories/addon_repository.dart';
 import '../../features/addon/domain/usecases/create_addon.dart';
 import '../../features/addon/domain/usecases/delete_addon.dart';
+import '../../features/addon/domain/usecases/get_addon_by_id.dart';
 import '../../features/addon/domain/usecases/get_addons.dart';
 import '../../features/addon/domain/usecases/update_addon.dart';
 import '../../features/addon/presentation/cubit/addon_cubit.dart';
+import '../../features/cashier/presentation/cubit/cart_cubit.dart';
 import '../../features/product/data/datasources/product_local_data_source.dart';
 import '../../features/product/data/repositories/product_repository_impl.dart';
 import '../../features/product/data/services/image_picker_service.dart';
@@ -173,6 +175,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => GetAddons(getIt<AddonRepository>()),
     );
   }
+  if (!getIt.isRegistered<GetAddonById>()) {
+    getIt.registerLazySingleton<GetAddonById>(
+      () => GetAddonById(getIt<AddonRepository>()),
+    );
+  }
   if (!getIt.isRegistered<CreateAddon>()) {
     getIt.registerLazySingleton<CreateAddon>(
       () => CreateAddon(getIt<AddonRepository>()),
@@ -276,6 +283,14 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
         getStoreProfileUseCase: getIt<GetStoreProfile>(),
         updateStoreProfileUseCase: getIt<UpdateStoreProfile>(),
         seedSampleDataUseCase: getIt<SeedSampleData>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<CartCubit>()) {
+    getIt.registerFactory<CartCubit>(
+      () => CartCubit(
+        getProductById: getIt<GetProductById>(),
+        getAddonById: getIt<GetAddonById>(),
       ),
     );
   }

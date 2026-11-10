@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vonte_pos/core/database/app_database.dart';
 import 'package:vonte_pos/core/di/injection.dart';
+import 'package:vonte_pos/features/addon/domain/usecases/get_addon_by_id.dart';
 import 'package:vonte_pos/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:vonte_pos/features/auth/domain/repositories/auth_repository.dart';
 import 'package:vonte_pos/features/auth/domain/usecases/get_current_session.dart';
@@ -8,6 +9,7 @@ import 'package:vonte_pos/features/auth/domain/usecases/login_user.dart';
 import 'package:vonte_pos/features/auth/domain/usecases/logout.dart';
 import 'package:vonte_pos/features/auth/domain/usecases/register_user.dart';
 import 'package:vonte_pos/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vonte_pos/features/cashier/presentation/cubit/cart_cubit.dart';
 import 'package:vonte_pos/features/category/data/datasources/category_local_data_source.dart';
 import 'package:vonte_pos/features/category/domain/repositories/category_repository.dart';
 import 'package:vonte_pos/features/category/domain/usecases/create_category.dart';
@@ -45,6 +47,9 @@ void main() {
       expect(getIt.isRegistered<UpdateCategory>(), isTrue);
       expect(getIt.isRegistered<DeleteCategory>(), isTrue);
       expect(getIt.isRegistered<CategoryCubit>(), isTrue);
+
+      expect(getIt.isRegistered<GetAddonById>(), isTrue);
+      expect(getIt.isRegistered<CartCubit>(), isTrue);
     });
 
     test('allows injecting custom AppDatabase instance', () async {
