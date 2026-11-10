@@ -8,6 +8,13 @@ import 'package:vonte_pos/features/auth/domain/usecases/login_user.dart';
 import 'package:vonte_pos/features/auth/domain/usecases/logout.dart';
 import 'package:vonte_pos/features/auth/domain/usecases/register_user.dart';
 import 'package:vonte_pos/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vonte_pos/features/category/data/datasources/category_local_data_source.dart';
+import 'package:vonte_pos/features/category/domain/repositories/category_repository.dart';
+import 'package:vonte_pos/features/category/domain/usecases/create_category.dart';
+import 'package:vonte_pos/features/category/domain/usecases/delete_category.dart';
+import 'package:vonte_pos/features/category/domain/usecases/get_categories.dart';
+import 'package:vonte_pos/features/category/domain/usecases/update_category.dart';
+import 'package:vonte_pos/features/category/presentation/cubit/category_cubit.dart';
 
 void main() {
   tearDown(() async {
@@ -30,6 +37,14 @@ void main() {
       expect(getIt.isRegistered<Logout>(), isTrue);
       expect(getIt.isRegistered<GetCurrentSession>(), isTrue);
       expect(getIt.isRegistered<AuthCubit>(), isTrue);
+
+      expect(getIt.isRegistered<CategoryLocalDataSource>(), isTrue);
+      expect(getIt.isRegistered<CategoryRepository>(), isTrue);
+      expect(getIt.isRegistered<GetCategories>(), isTrue);
+      expect(getIt.isRegistered<CreateCategory>(), isTrue);
+      expect(getIt.isRegistered<UpdateCategory>(), isTrue);
+      expect(getIt.isRegistered<DeleteCategory>(), isTrue);
+      expect(getIt.isRegistered<CategoryCubit>(), isTrue);
     });
 
     test('allows injecting custom AppDatabase instance', () async {

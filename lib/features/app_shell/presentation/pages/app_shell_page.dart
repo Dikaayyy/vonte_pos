@@ -14,6 +14,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../../features/auth/presentation/cubit/auth_state.dart';
+import '../../../../features/product/presentation/pages/product_shell_page.dart';
 import '../widgets/floating_glass_bottom_bar.dart';
 
 /// AppShell hosts the primary 4 destinations after authentication:
@@ -66,7 +67,7 @@ class _AppShellState extends State<AppShell> {
 
   late final List<Widget> _pages = [
     const CashierPlaceholderView(),
-    const ProductPlaceholderView(),
+    const ProductShellPage(),
     const ReportPlaceholderView(),
     const SettingsPlaceholderView(),
   ];

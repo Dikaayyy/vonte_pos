@@ -112,4 +112,30 @@ abstract final class AppStrings {
   static const String usernameNoSpaces = 'Username tidak boleh mengandung spasi.';
   static const String usernameAlreadyTaken = 'Username sudah digunakan.';
   static const String passwordMinLength = 'Password minimal 6 karakter.';
+
+  // Product & Category Management
+  static const String productTabLabel = 'Produk';
+  static const String categoryTabLabel = 'Kategori';
+  static const String addonTabLabel = 'Add-on';
+  static const String categoryListTitle = 'Daftar Kategori';
+  static const String categoryListSubtitle = 'Kelola pengelompokan menu dan produk toko.';
+  static const String addCategory = 'Tambah Kategori';
+  static const String editCategory = 'Ubah Kategori';
+  static const String deleteCategory = 'Hapus Kategori';
+  static const String categoryNameLabel = 'Nama Kategori';
+  static const String categoryNameHint = 'Contoh: Minuman Kopi';
+  static const String categoryNameRequired = 'Nama kategori tidak boleh kosong.';
+  static const String categoryNameDuplicate = 'Nama kategori sudah digunakan.';
+  static const String deleteCategoryConfirmTitle = 'Hapus Kategori?';
+  static const String deleteCategoryConfirmMessage =
+      'Produk di dalam kategori ini tidak akan dihapus, tetapi kategorinya akan diubah menjadi Tanpa Kategori.';
+  static const String emptyCategoryTitle = 'Belum ada kategori';
+  static const String emptyCategorySubtitle =
+      'Tambahkan kategori untuk memudahkan pengelompokan produk.';
+  static const String productCountSuffix = 'produk';
+  static const String uncategorized = 'Tanpa Kategori';
+  static const String productCatalogPlaceholder =
+      'Katalog produk utama akan aktif pada slice produk.';
+  static const String addonCatalogPlaceholder =
+      'Daftar add-on akan aktif pada slice add-on.';
 }
