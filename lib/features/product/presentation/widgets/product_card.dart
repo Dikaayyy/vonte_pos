@@ -7,6 +7,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_rupiah.dart';
+import '../../../../core/widgets/stock_badge.dart';
 import '../../data/services/photo_storage.dart';
 import '../../domain/entities/product.dart';
 import 'product_image_view.dart';
@@ -142,17 +143,14 @@ class ProductCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
-                    Text(
-                      '${AppStrings.stockLabelPrefix} ${product.stock}',
-                      style: AppTypography.caption.copyWith(
-                        color: product.isOutOfStock
-                            ? AppColors.error
-                            : (product.hasLowStock
-                                ? AppColors.warning
-                                : AppColors.onSurfaceVariant),
-                        fontWeight: FontWeight.w600,
+                    if (!product.isOutOfStock && !product.hasLowStock)
+                      Text(
+                        '${AppStrings.stockLabelPrefix} ${product.stock}',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
                     const Spacer(),
                     if (onEdit != null)
                       IconButton(
@@ -192,49 +190,7 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildStockBadge() {
-    if (product.isOutOfStock) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.errorSoft,
-          borderRadius: AppRadius.borderRadiusFull,
-          border: Border.all(color: AppColors.error, width: 1),
-        ),
-        child: Text(
-          AppStrings.outOfStockBadge,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.error,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
-    }
-
-    if (product.hasLowStock) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.warningSoft,
-          borderRadius: AppRadius.borderRadiusFull,
-          border: Border.all(color: AppColors.warning, width: 1),
-        ),
-        child: Text(
-          '${AppStrings.lowStockPrefix} ${product.stock}',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.warning,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+    return StockBadge(stock: product.stock);
   }
 }
 

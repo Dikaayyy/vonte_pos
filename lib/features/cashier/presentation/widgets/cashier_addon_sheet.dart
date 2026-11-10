@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_rupiah.dart';
 import '../../../../core/widgets/qty_stepper.dart';
+import '../../../../core/widgets/stock_badge.dart';
 import '../../../addon/domain/entities/addon.dart';
 import '../../../product/domain/entities/product.dart';
 
@@ -341,28 +342,7 @@ class _CashierAddonSheetState extends State<CashierAddonSheet> {
 
                                       // Price or Out of stock badge
                                       if (isExhausted)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: AppSpacing.sm,
-                                            vertical: AppSpacing.xs,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.errorSoft,
-                                            borderRadius:
-                                                AppRadius.borderRadiusFull,
-                                            border: Border.all(
-                                              color: AppColors.error,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            AppStrings.outOfStockBadge,
-                                            style: AppTypography.caption.copyWith(
-                                              color: AppColors.error,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        )
+                                        const StockBadge.outOfStock()
                                       else
                                         Text(
                                           addon.price == 0

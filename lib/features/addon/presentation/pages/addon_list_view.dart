@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_rupiah.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/stock_badge.dart';
 import '../../domain/entities/addon.dart';
 import '../cubit/addon_cubit.dart';
 import '../cubit/addon_state.dart';
@@ -254,27 +255,15 @@ class AddonListView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    Text(
-                      '${AppStrings.stockLabelPrefix} ${addon.stock}',
-                      style: AppTypography.bodySm.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                    if (addon.isOutOfStock || addon.isLowStock)
+                      StockBadge(stock: addon.stock)
+                    else
+                      Text(
+                        '${AppStrings.stockLabelPrefix} ${addon.stock}',
+                        style: AppTypography.bodySm.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                    if (addon.isOutOfStock) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      _buildBadge(
-                        label: AppStrings.outOfStockBadge,
-                        backgroundColor: AppColors.errorSoft,
-                        textColor: AppColors.error,
-                      ),
-                    ] else if (addon.isLowStock) ...[
-                      const SizedBox(width: AppSpacing.sm),
-                      _buildBadge(
-                        label: 'Sisa ${addon.stock}',
-                        backgroundColor: AppColors.warningSoft,
-                        textColor: AppColors.warning,
-                      ),
-                    ],
                   ],
                 ),
               ],
@@ -314,34 +303,6 @@ class AddonListView extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBadge({
-    required String label,
-    required Color backgroundColor,
-    required Color textColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: AppRadius.borderRadiusFull,
-        border: Border.all(
-          color: textColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.caption.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.w700,
-        ),
       ),
     );
   }

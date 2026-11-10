@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_card.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -7,6 +8,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/format_rupiah.dart';
+import '../../../../core/widgets/stock_badge.dart';
 import '../../../product/data/services/photo_storage.dart';
 import '../../../product/domain/entities/product.dart';
 import '../../../product/presentation/widgets/product_image_view.dart';
@@ -37,9 +39,16 @@ class CashierProductCard extends StatelessWidget {
     this.photoStorage,
   });
 
+  int get remainingStock =>
+      (product.stock - unitsInCart).clamp(0, product.stock);
   bool get isOutOfStock => product.isOutOfStock;
   bool get isCartStockFull =>
       !isOutOfStock && product.stock > 0 && unitsInCart >= product.stock;
+  bool get hasLowStock =>
+      !isOutOfStock &&
+      !isCartStockFull &&
+      remainingStock > 0 &&
+      remainingStock <= AppConstants.lowStockThreshold;
   bool get isTappable => !isOutOfStock && !isCartStockFull && onTap != null;
 
   @override
@@ -148,67 +157,15 @@ class CashierProductCard extends StatelessWidget {
 
   Widget _buildStatusBadge() {
     if (isOutOfStock) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.errorSoft,
-          borderRadius: AppRadius.borderRadiusFull,
-          border: Border.all(color: AppColors.error, width: 1),
-        ),
-        child: Text(
-          AppStrings.outOfStockBadge,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.error,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
+      return const StockBadge.outOfStock();
     }
 
     if (isCartStockFull) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.warningSoft,
-          borderRadius: AppRadius.borderRadiusFull,
-          border: Border.all(color: AppColors.warning, width: 1),
-        ),
-        child: Text(
-          AppStrings.stockAlreadyInCart,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.warning,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
+      return const StockBadge.cartFull();
     }
 
-    if (product.hasLowStock) {
-      final remaining = product.stock - unitsInCart;
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.warningSoft,
-          borderRadius: AppRadius.borderRadiusFull,
-          border: Border.all(color: AppColors.warning, width: 1),
-        ),
-        child: Text(
-          '${AppStrings.lowStockPrefix} $remaining',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.warning,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
+    if (hasLowStock) {
+      return StockBadge.lowStock(stock: remainingStock);
     }
 
     return const SizedBox.shrink();
@@ -251,33 +208,15 @@ class CashierProductCard extends StatelessWidget {
   }
 
   Widget _buildStockIndicator() {
-    if (isOutOfStock) {
-      return Text(
-        AppStrings.stockExhaustedGeneral,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.error,
-          fontWeight: FontWeight.w600,
-        ),
-      );
+    // Avoid redundant indicator when a status/low-stock badge is already visible on the card.
+    if (isOutOfStock || isCartStockFull || hasLowStock) {
+      return const SizedBox.shrink();
     }
 
-    if (isCartStockFull) {
-      return Text(
-        AppStrings.stockAlreadyInCart,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.warning,
-          fontWeight: FontWeight.w600,
-        ),
-      );
-    }
-
-    final remaining = product.stock - unitsInCart;
     return Text(
-      '${AppStrings.stockLabelPrefix} $remaining',
+      '${AppStrings.stockLabelPrefix} $remainingStock',
       style: AppTypography.caption.copyWith(
-        color: product.hasLowStock
-            ? AppColors.warning
-            : AppColors.onSurfaceVariant,
+        color: AppColors.onSurfaceVariant,
         fontWeight: FontWeight.w500,
         fontFeatures: AppTypography.tabularFigures,
       ),
