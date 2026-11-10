@@ -139,6 +139,47 @@ abstract final class AppStrings {
   static const String addonCatalogPlaceholder =
       'Daftar add-on akan aktif pada slice add-on.';
 
+  // Product Management
+  static const String productListTitle = 'Daftar Produk';
+  static const String productListSubtitle = 'Kelola katalog produk, harga, stok, dan add-on.';
+  static const String addProduct = 'Tambah Produk';
+  static const String editProduct = 'Ubah Produk';
+  static const String deleteProduct = 'Hapus Produk';
+  static const String productNameLabel = 'Nama Produk';
+  static const String productNameHint = 'Contoh: Kopi Susu Aren';
+  static const String productCategoryLabel = 'Kategori';
+  static const String productCategoryHint = 'Pilih kategori (opsional)';
+  static const String productPriceLabel = 'Harga Jual (Rp)';
+  static const String productPriceHint = 'Contoh: 18000';
+  static const String productStockLabel = 'Jumlah Stok';
+  static const String productStockHint = 'Contoh: 25';
+  static const String productAddonsLabel = 'Pilihan Add-on';
+  static const String productPhotoLabel = 'Foto Produk';
+  static const String pickFromCamera = 'Kamera';
+  static const String pickFromGallery = 'Galeri';
+  static const String changePhoto = 'Ganti Foto';
+  static const String removePhoto = 'Hapus Foto';
+  static const String searchProductHint = 'Cari produk...';
+  static const String allCategories = 'Semua';
+  static const String deleteProductConfirmTitle = 'Hapus Produk?';
+  static const String deleteProductConfirmMessage =
+      'Produk ini akan dihapus dari katalog dan kasir, tetapi riwayat transaksi sebelumnya tetap aman.';
+  static const String emptyProductTitle = 'Belum ada produk';
+  static const String emptyProductSubtitle =
+      'Tambahkan produk untuk mulai menyusun menu penjualan toko.';
+  static const String noProductFoundTitle = 'Produk tidak ditemukan';
+  static const String noProductFoundSubtitle =
+      'Coba kata kunci pencarian atau kategori filter lain.';
+  static const String productNameRequired = 'Nama produk tidak boleh kosong.';
+  static const String productPriceInvalid = 'Harga produk harus lebih dari 0.';
+  static const String productPriceNan = 'Harga produk harus berupa angka valid.';
+  static const String productStockInvalid = 'Stok produk minimal 0.';
+  static const String productStockNan = 'Stok produk harus berupa angka valid.';
+  static const String lowStockPrefix = 'Sisa';
+  static const String selectPhotoPrompt = 'Pilih Foto Produk';
+  static const String addonCountPrefix = 'Add-on:';
+  static const String noAddonsAvailable = 'Belum ada add-on yang dibuat di sistem.';
+
   // Add-on Management
   static const String addonListTitle = 'Daftar Add-on';
   static const String addonListSubtitle =

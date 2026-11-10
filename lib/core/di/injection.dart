@@ -24,16 +24,43 @@ import '../../features/addon/domain/usecases/delete_addon.dart';
 import '../../features/addon/domain/usecases/get_addons.dart';
 import '../../features/addon/domain/usecases/update_addon.dart';
 import '../../features/addon/presentation/cubit/addon_cubit.dart';
+import '../../features/product/data/datasources/product_local_data_source.dart';
+import '../../features/product/data/repositories/product_repository_impl.dart';
+import '../../features/product/data/services/image_picker_service.dart';
+import '../../features/product/data/services/photo_storage.dart';
+import '../../features/product/domain/repositories/product_repository.dart';
+import '../../features/product/domain/usecases/create_product.dart';
+import '../../features/product/domain/usecases/delete_product.dart';
+import '../../features/product/domain/usecases/get_product_by_id.dart';
+import '../../features/product/domain/usecases/get_products.dart';
+import '../../features/product/domain/usecases/update_product.dart';
+import '../../features/product/presentation/cubit/product_cubit.dart';
 import '../database/app_database.dart';
+import '../storage/app_directory_provider.dart';
 
 final getIt = GetIt.instance;
 final sl = getIt;
 
 Future<void> initDependencies({AppDatabase? appDatabase}) async {
-  // 1. Core & Database
+  // 1. Core & Database & Storage
   final database = appDatabase ?? AppDatabase();
   if (!getIt.isRegistered<AppDatabase>()) {
     getIt.registerLazySingleton<AppDatabase>(() => database);
+  }
+  if (!getIt.isRegistered<AppDirectoryProvider>()) {
+    getIt.registerLazySingleton<AppDirectoryProvider>(
+      () => const AppDirectoryProviderImpl(),
+    );
+  }
+  if (!getIt.isRegistered<PhotoStorage>()) {
+    getIt.registerLazySingleton<PhotoStorage>(
+      () => PhotoStorageImpl(getIt<AppDirectoryProvider>()),
+    );
+  }
+  if (!getIt.isRegistered<AppImagePickerService>()) {
+    getIt.registerLazySingleton<AppImagePickerService>(
+      () => AppImagePickerServiceImpl(),
+    );
   }
 
   // 2. Data Sources
@@ -52,6 +79,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => AddonLocalDataSourceImpl(getIt<AppDatabase>()),
     );
   }
+  if (!getIt.isRegistered<ProductLocalDataSource>()) {
+    getIt.registerLazySingleton<ProductLocalDataSource>(
+      () => ProductLocalDataSourceImpl(getIt<AppDatabase>()),
+    );
+  }
 
   // 3. Repositories
   if (!getIt.isRegistered<AuthRepository>()) {
@@ -67,6 +99,14 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
   if (!getIt.isRegistered<AddonRepository>()) {
     getIt.registerLazySingleton<AddonRepository>(
       () => AddonRepositoryImpl(getIt<AddonLocalDataSource>()),
+    );
+  }
+  if (!getIt.isRegistered<ProductRepository>()) {
+    getIt.registerLazySingleton<ProductRepository>(
+      () => ProductRepositoryImpl(
+        getIt<ProductLocalDataSource>(),
+        getIt<PhotoStorage>(),
+      ),
     );
   }
 
@@ -131,6 +171,31 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => DeleteAddon(getIt<AddonRepository>()),
     );
   }
+  if (!getIt.isRegistered<GetProducts>()) {
+    getIt.registerLazySingleton<GetProducts>(
+      () => GetProducts(getIt<ProductRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<GetProductById>()) {
+    getIt.registerLazySingleton<GetProductById>(
+      () => GetProductById(getIt<ProductRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<CreateProduct>()) {
+    getIt.registerLazySingleton<CreateProduct>(
+      () => CreateProduct(getIt<ProductRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<UpdateProduct>()) {
+    getIt.registerLazySingleton<UpdateProduct>(
+      () => UpdateProduct(getIt<ProductRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<DeleteProduct>()) {
+    getIt.registerLazySingleton<DeleteProduct>(
+      () => DeleteProduct(getIt<ProductRepository>()),
+    );
+  }
 
   // 5. Cubits (Factory)
   if (!getIt.isRegistered<AuthCubit>()) {
@@ -160,6 +225,16 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
         createAddonUseCase: getIt<CreateAddon>(),
         updateAddonUseCase: getIt<UpdateAddon>(),
         deleteAddonUseCase: getIt<DeleteAddon>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<ProductCubit>()) {
+    getIt.registerFactory<ProductCubit>(
+      () => ProductCubit(
+        getProductsUseCase: getIt<GetProducts>(),
+        createProductUseCase: getIt<CreateProduct>(),
+        updateProductUseCase: getIt<UpdateProduct>(),
+        deleteProductUseCase: getIt<DeleteProduct>(),
       ),
     );
   }

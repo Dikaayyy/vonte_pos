@@ -14,15 +14,19 @@ import '../../../category/presentation/cubit/category_cubit.dart';
 import '../../../category/presentation/pages/category_list_view.dart';
 import '../../../addon/presentation/cubit/addon_cubit.dart';
 import '../../../addon/presentation/pages/addon_list_view.dart';
+import '../cubit/product_cubit.dart';
+import 'product_list_view.dart';
 
 class ProductShellPage extends StatefulWidget {
   final int initialSubIndex;
+  final ProductCubit? productCubit;
   final CategoryCubit? categoryCubit;
   final AddonCubit? addonCubit;
 
   const ProductShellPage({
     super.key,
-    this.initialSubIndex = 1, // Defaults to Kategori for immediate evaluation
+    this.initialSubIndex = 0,
+    this.productCubit,
     this.categoryCubit,
     this.addonCubit,
   });
@@ -176,10 +180,19 @@ class _ProductShellPageState extends State<ProductShellPage> {
         body: IndexedStack(
           index: _selectedSegment,
           children: [
-            _buildPlaceholder(
-              title: AppStrings.productTabLabel,
-              subtitle: AppStrings.productCatalogPlaceholder,
-              icon: Icons.inventory_2_outlined,
+            Builder(
+              builder: (ctx) {
+                try {
+                  ctx.read<ProductCubit>();
+                  return const ProductListView();
+                } catch (_) {
+                  return _buildPlaceholder(
+                    title: AppStrings.productTabLabel,
+                    subtitle: AppStrings.productCatalogPlaceholder,
+                    icon: Icons.inventory_2_outlined,
+                  );
+                }
+              },
             ),
             Builder(
               builder: (ctx) {
@@ -214,6 +227,20 @@ class _ProductShellPageState extends State<ProductShellPage> {
       );
 
     final providers = <BlocProvider>[];
+    if (widget.productCubit != null) {
+      providers.add(
+        BlocProvider<ProductCubit>.value(
+          value: widget.productCubit!..loadProducts(),
+        ),
+      );
+    } else if (getIt.isRegistered<ProductCubit>()) {
+      providers.add(
+        BlocProvider<ProductCubit>(
+          create: (context) => getIt<ProductCubit>()..loadProducts(),
+        ),
+      );
+    }
+
     if (widget.categoryCubit != null) {
       providers.add(
         BlocProvider<CategoryCubit>.value(
