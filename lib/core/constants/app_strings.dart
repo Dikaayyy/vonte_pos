@@ -75,4 +75,37 @@ abstract final class AppStrings {
 
   static const String sampleErrorMessage = 'Stok tidak cukup. Tersisa 2 unit.';
   static const String sampleStockExhausted = 'Stok habis. Produk tidak dapat ditambah ke keranjang.';
+
+  // Authentication & Session
+  static const String appName = 'Vonte PoS';
+  static const String appTagline = 'Aplikasi Kasir Offline Cepat & Mandiri';
+  static const String authLoginTitle = 'Masuk Kasir';
+  static const String authLoginSubtitle = 'Masuk untuk memulai sesi transaksi kasir.';
+  static const String authRegisterTitle = 'Daftar Kasir Baru';
+  static const String authRegisterSubtitle = 'Buat akun kasir baru untuk mengelola penjualan.';
+  static const String nameLabel = 'Nama Lengkap';
+  static const String nameHint = 'Masukkan nama lengkap';
+  static const String usernameLabel = 'Username';
+  static const String usernameHint = 'Minimal 3 karakter tanpa spasi';
+  static const String passwordLabel = 'Kata Sandi';
+  static const String passwordHint = 'Minimal 6 karakter';
+  static const String loginButton = 'Masuk';
+  static const String registerButton = 'Daftar';
+  static const String dontHaveAccount = 'Belum punya akun? ';
+  static const String haveAccount = 'Sudah punya akun? ';
+  static const String goToRegister = 'Daftar Akun';
+  static const String goToLogin = 'Masuk ke Akun';
+  static const String logout = 'Keluar';
+  static const String homePlaceholderTitle = 'Beranda Kasir';
+  static const String activeSessionTitle = 'Sesi Aktif';
+  static const String loggedInAs = 'Kasir aktif:';
+  static const String invalidCredentials = 'Username atau kata sandi salah.';
+  static const String sessionExpired = 'Sesi telah berakhir.';
+
+  // Validation Rules
+  static const String nameRequired = 'Nama tidak boleh kosong.';
+  static const String usernameMinLength = 'Username minimal 3 karakter.';
+  static const String usernameNoSpaces = 'Username tidak boleh mengandung spasi.';
+  static const String usernameAlreadyTaken = 'Username sudah digunakan.';
+  static const String passwordMinLength = 'Password minimal 6 karakter.';
 }
