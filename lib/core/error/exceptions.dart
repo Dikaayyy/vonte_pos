@@ -17,3 +17,7 @@ class ValidationException extends AppException {
 class AppDatabaseException extends AppException {
   const AppDatabaseException(super.message);
 }
+
+class CheckoutException extends AppException {
+  const CheckoutException(super.message);
+}

@@ -270,6 +270,30 @@ abstract final class AppStrings {
   static const String noAddonsSelected = 'Tanpa add-on';
   static const String maxStockReached = 'Mencapai batas stok';
 
+  // Checkout & Receipt Strings
+  static const String receiptTitle = 'Struk Pembayaran';
+  static const String paymentSuccess = 'Pembayaran Berhasil';
+  static const String cashReceivedLabel = 'Uang Diterima';
+  static const String cashReceivedHint = 'Masukkan nominal uang';
+  static const String changeLabel = 'Kembalian';
+  static const String exactMoney = 'Uang pas';
+  static const String paymentShortage = 'Uang kurang';
+  static const String discountLabel = 'Diskon';
+  static const String discountTypeRp = 'Rp';
+  static const String discountTypePercent = '%';
+  static const String discountHint = '0';
+  static const String discountPercentHint = '0%';
+  static const String payButton = 'Bayar';
+  static const String finishButton = 'Selesai';
+  static const String printButton = 'Cetak';
+  static const String printerComingSoon = 'Fitur cetak printer akan hadir pada pembaruan berikutnya.';
+  static const String invoiceNoLabel = 'No. Invoice';
+  static const String cashierLabel = 'Kasir:';
+  static const String dateLabel = 'Waktu:';
+  static const String totalBill = 'Total Tagihan';
+  static const String cashPayment = 'Tunai';
+  static const String defaultStoreFooter = 'Terima kasih atas kunjungan Anda';
+
   // Logout & Session
   static const String logoutConfirmTitle = 'Konfirmasi Keluar';
   static const String logoutConfirmMessage =

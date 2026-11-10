@@ -111,10 +111,11 @@ class CashierCartView extends StatelessWidget {
   }
 
   void _onPayPressed(BuildContext context) {
+    final cartCubit = context.read<CartCubit>();
     if (isSheet) {
       Navigator.of(context).pop();
     }
-    Navigator.of(context).pushNamed(AppRoutes.checkout);
+    Navigator.of(context).pushNamed(AppRoutes.checkout, arguments: cartCubit);
   }
 
   @override
