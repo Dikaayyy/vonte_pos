@@ -242,6 +242,17 @@ abstract final class AppStrings {
       'Data contoh hanya dapat dimuat saat katalog masih kosong.';
   static const String confirmSeed = 'Muat Data';
 
+  // Cashier Domain Validation Strings
+  static const String stockInsufficient = 'Stok tidak cukup.';
+  static const String stockExhaustedGeneral = 'Stok habis.';
+  static const String discountPercentOutOfRange =
+      'Diskon persen harus antara 0% hingga 100%.';
+  static const String discountFixedExceedsSubtotal =
+      'Diskon nominal tidak boleh melebihi subtotal.';
+  static const String discountFixedNegative =
+      'Diskon nominal tidak boleh negatif.';
+  static const String paymentInsufficient = 'Uang pembayaran kurang.';
+
   // Logout & Session
   static const String logoutConfirmTitle = 'Konfirmasi Keluar';
   static const String logoutConfirmMessage =
