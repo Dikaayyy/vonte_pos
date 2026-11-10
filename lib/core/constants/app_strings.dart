@@ -253,6 +253,23 @@ abstract final class AppStrings {
       'Diskon nominal tidak boleh negatif.';
   static const String paymentInsufficient = 'Uang pembayaran kurang.';
 
+  // Cashier UI Strings
+  static const String stockAlreadyInCart = 'Stok sudah di keranjang';
+  static const String addToCart = 'Tambah ke keranjang';
+  static const String cartTitle = 'Keranjang';
+  static const String viewCart = 'Lihat Keranjang';
+  static const String subtotal = 'Subtotal';
+  static const String discount = 'Diskon';
+  static const String total = 'Total';
+  static const String checkoutTitle = 'Pembayaran';
+  static const String checkoutPlaceholderSubtitle =
+      'Proses pembayaran tunai dan cetak struk (tersedia di slice 6).';
+  static const String itemSuffix = 'item';
+  static const String orderQuantityLabel = 'Jumlah Pesanan';
+  static const String selectAddonPrompt = 'Pilih Add-on (Opsional)';
+  static const String noAddonsSelected = 'Tanpa add-on';
+  static const String maxStockReached = 'Mencapai batas stok';
+
   // Logout & Session
   static const String logoutConfirmTitle = 'Konfirmasi Keluar';
   static const String logoutConfirmMessage =

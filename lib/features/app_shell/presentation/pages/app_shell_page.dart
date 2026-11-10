@@ -16,6 +16,8 @@ import '../../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../../features/auth/presentation/cubit/auth_state.dart';
 import '../../../../features/category/presentation/cubit/category_cubit.dart';
 import '../../../../features/addon/presentation/cubit/addon_cubit.dart';
+import '../../../../features/cashier/presentation/cubit/cart_cubit.dart';
+import '../../../../features/cashier/presentation/pages/cashier_view.dart';
 import '../../../../features/product/presentation/cubit/product_cubit.dart';
 import '../../../../features/product/presentation/pages/product_shell_page.dart';
 import '../../../../features/store_profile/presentation/cubit/store_profile_cubit.dart';
@@ -41,6 +43,8 @@ class AppShell extends StatefulWidget {
     this.productCubit,
     this.categoryCubit,
     this.addonCubit,
+    this.cartCubit,
+    this.cashierChild,
   });
 
   static const String routeName = AppRoutes.home;
@@ -50,6 +54,8 @@ class AppShell extends StatefulWidget {
   final ProductCubit? productCubit;
   final CategoryCubit? categoryCubit;
   final AddonCubit? addonCubit;
+  final CartCubit? cartCubit;
+  final Widget? cashierChild;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -82,7 +88,17 @@ class _AppShellState extends State<AppShell> {
   ];
 
   late final List<Widget> _pages = [
-    const CashierPlaceholderView(),
+    Builder(
+      builder: (ctx) {
+        try {
+          ctx.read<CartCubit>();
+          ctx.read<ProductCubit>();
+          return const CashierView();
+        } catch (_) {
+          return widget.cashierChild ?? const CashierPlaceholderView();
+        }
+      },
+    ),
     const ProductShellPage(),
     const ReportPlaceholderView(),
     SettingsPage(storeProfileCubit: widget.storeProfileCubit),
@@ -208,6 +224,20 @@ class _AppShellState extends State<AppShell> {
       providers.add(
         BlocProvider<AddonCubit>(
           create: (_) => getIt<AddonCubit>()..loadAddons(),
+        ),
+      );
+    }
+
+    if (widget.cartCubit != null) {
+      providers.add(
+        BlocProvider<CartCubit>.value(
+          value: widget.cartCubit!,
+        ),
+      );
+    } else if (getIt.isRegistered<CartCubit>()) {
+      providers.add(
+        BlocProvider<CartCubit>(
+          create: (_) => getIt<CartCubit>(),
         ),
       );
     }
