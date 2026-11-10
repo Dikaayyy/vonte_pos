@@ -35,6 +35,13 @@ import '../../features/product/domain/usecases/get_product_by_id.dart';
 import '../../features/product/domain/usecases/get_products.dart';
 import '../../features/product/domain/usecases/update_product.dart';
 import '../../features/product/presentation/cubit/product_cubit.dart';
+import '../../features/store_profile/data/datasources/store_profile_local_data_source.dart';
+import '../../features/store_profile/data/repositories/store_profile_repository_impl.dart';
+import '../../features/store_profile/domain/repositories/store_profile_repository.dart';
+import '../../features/store_profile/domain/usecases/get_store_profile.dart';
+import '../../features/store_profile/domain/usecases/seed_sample_data.dart';
+import '../../features/store_profile/domain/usecases/update_store_profile.dart';
+import '../../features/store_profile/presentation/cubit/store_profile_cubit.dart';
 import '../database/app_database.dart';
 import '../storage/app_directory_provider.dart';
 
@@ -84,6 +91,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => ProductLocalDataSourceImpl(getIt<AppDatabase>()),
     );
   }
+  if (!getIt.isRegistered<StoreProfileLocalDataSource>()) {
+    getIt.registerLazySingleton<StoreProfileLocalDataSource>(
+      () => StoreProfileLocalDataSourceImpl(getIt<AppDatabase>()),
+    );
+  }
 
   // 3. Repositories
   if (!getIt.isRegistered<AuthRepository>()) {
@@ -107,6 +119,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
         getIt<ProductLocalDataSource>(),
         getIt<PhotoStorage>(),
       ),
+    );
+  }
+  if (!getIt.isRegistered<StoreProfileRepository>()) {
+    getIt.registerLazySingleton<StoreProfileRepository>(
+      () => StoreProfileRepositoryImpl(getIt<StoreProfileLocalDataSource>()),
     );
   }
 
@@ -196,6 +213,21 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => DeleteProduct(getIt<ProductRepository>()),
     );
   }
+  if (!getIt.isRegistered<GetStoreProfile>()) {
+    getIt.registerLazySingleton<GetStoreProfile>(
+      () => GetStoreProfile(getIt<StoreProfileRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<UpdateStoreProfile>()) {
+    getIt.registerLazySingleton<UpdateStoreProfile>(
+      () => UpdateStoreProfile(getIt<StoreProfileRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<SeedSampleData>()) {
+    getIt.registerLazySingleton<SeedSampleData>(
+      () => SeedSampleData(getIt<StoreProfileRepository>()),
+    );
+  }
 
   // 5. Cubits (Factory)
   if (!getIt.isRegistered<AuthCubit>()) {
@@ -235,6 +267,15 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
         createProductUseCase: getIt<CreateProduct>(),
         updateProductUseCase: getIt<UpdateProduct>(),
         deleteProductUseCase: getIt<DeleteProduct>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<StoreProfileCubit>()) {
+    getIt.registerFactory<StoreProfileCubit>(
+      () => StoreProfileCubit(
+        getStoreProfileUseCase: getIt<GetStoreProfile>(),
+        updateStoreProfileUseCase: getIt<UpdateStoreProfile>(),
+        seedSampleDataUseCase: getIt<SeedSampleData>(),
       ),
     );
   }

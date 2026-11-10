@@ -233,12 +233,18 @@ class _ProductShellPageState extends State<ProductShellPage> {
           value: widget.productCubit!..loadProducts(),
         ),
       );
-    } else if (getIt.isRegistered<ProductCubit>()) {
-      providers.add(
-        BlocProvider<ProductCubit>(
-          create: (context) => getIt<ProductCubit>()..loadProducts(),
-        ),
-      );
+    } else {
+      try {
+        context.read<ProductCubit>();
+      } catch (_) {
+        if (getIt.isRegistered<ProductCubit>()) {
+          providers.add(
+            BlocProvider<ProductCubit>(
+              create: (context) => getIt<ProductCubit>()..loadProducts(),
+            ),
+          );
+        }
+      }
     }
 
     if (widget.categoryCubit != null) {
@@ -247,12 +253,18 @@ class _ProductShellPageState extends State<ProductShellPage> {
           value: widget.categoryCubit!..loadCategories(),
         ),
       );
-    } else if (getIt.isRegistered<CategoryCubit>()) {
-      providers.add(
-        BlocProvider<CategoryCubit>(
-          create: (context) => getIt<CategoryCubit>()..loadCategories(),
-        ),
-      );
+    } else {
+      try {
+        context.read<CategoryCubit>();
+      } catch (_) {
+        if (getIt.isRegistered<CategoryCubit>()) {
+          providers.add(
+            BlocProvider<CategoryCubit>(
+              create: (context) => getIt<CategoryCubit>()..loadCategories(),
+            ),
+          );
+        }
+      }
     }
 
     if (widget.addonCubit != null) {
@@ -261,12 +273,18 @@ class _ProductShellPageState extends State<ProductShellPage> {
           value: widget.addonCubit!..loadAddons(),
         ),
       );
-    } else if (getIt.isRegistered<AddonCubit>()) {
-      providers.add(
-        BlocProvider<AddonCubit>(
-          create: (context) => getIt<AddonCubit>()..loadAddons(),
-        ),
-      );
+    } else {
+      try {
+        context.read<AddonCubit>();
+      } catch (_) {
+        if (getIt.isRegistered<AddonCubit>()) {
+          providers.add(
+            BlocProvider<AddonCubit>(
+              create: (context) => getIt<AddonCubit>()..loadAddons(),
+            ),
+          );
+        }
+      }
     }
 
     if (providers.isNotEmpty) {

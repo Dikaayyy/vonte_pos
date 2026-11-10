@@ -207,4 +207,46 @@ abstract final class AppStrings {
   static const String outOfStockBadge = 'Habis';
   static const String freePriceLabel = 'Gratis';
   static const String stockLabelPrefix = 'Stok:';
+
+  // Store Profile & Settings
+  static const String storeProfileTitle = 'Profil Toko';
+  static const String storeProfileSubtitle =
+      'Informasi toko yang akan tercetak pada struk transaksi.';
+  static const String storeNameLabel = 'Nama Toko';
+  static const String storeNameHint = 'Contoh: Vonte Coffee & Bakery';
+  static const String storeAddressLabel = 'Alamat Toko';
+  static const String storeAddressHint = 'Contoh: Jl. Sudirman No. 10';
+  static const String storePhoneLabel = 'Nomor Telepon';
+  static const String storePhoneHint = 'Contoh: 081234567890';
+  static const String storeReceiptFooterLabel = 'Pesan Footer Struk';
+  static const String storeReceiptFooterHint =
+      'Contoh: Terima kasih atas kunjungan Anda';
+  static const String saveStoreProfile = 'Simpan Profil';
+  static const String storeProfileSaved = 'Profil toko berhasil disimpan.';
+  static const String storeNameRequired = 'Nama toko tidak boleh kosong.';
+  static const String storeAddressRequired = 'Alamat toko tidak boleh kosong.';
+  static const String storePhoneRequired = 'Nomor telepon tidak boleh kosong.';
+  static const String storeReceiptFooterRequired =
+      'Pesan footer struk tidak boleh kosong.';
+
+  // Sample Data Seeding
+  static const String sampleDataTitle = 'Data Contoh';
+  static const String sampleDataSubtitle =
+      'Muat menu contoh kopi dan roti jika katalog toko masih kosong.';
+  static const String seedSampleData = 'Muat Data Contoh';
+  static const String seedSampleDataConfirmTitle = 'Muat Data Contoh?';
+  static const String seedSampleDataConfirmMessage =
+      'Data contoh untuk kedai kopi dan roti akan ditambahkan ke katalog. Tindakan ini hanya dapat dilakukan saat katalog masih kosong. Lanjutkan?';
+  static const String seedSampleDataSuccess = 'Data contoh berhasil dimuat.';
+  static const String seedSampleDataAlreadyPopulated =
+      'Data contoh hanya dapat dimuat saat katalog masih kosong.';
+  static const String confirmSeed = 'Muat Data';
+
+  // Logout & Session
+  static const String logoutConfirmTitle = 'Konfirmasi Keluar';
+  static const String logoutConfirmMessage =
+      'Apakah Anda yakin ingin mengakhiri sesi kasir ini?';
+  static const String userSessionTitle = 'Sesi Kasir Aktif';
+  static const String userSessionStartTime = 'Waktu Sesi Dimulai';
+  static const String userIdLabel = 'ID Pengguna';
 }

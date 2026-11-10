@@ -53,16 +53,54 @@ class ProductFormDialog extends StatefulWidget {
     }) onSave,
     PhotoStorage? photoStorage,
     AppImagePickerService? imagePickerService,
+    CategoryCubit? categoryCubit,
+    AddonCubit? addonCubit,
   }) {
+    CategoryCubit? resolvedCategoryCubit = categoryCubit;
+    if (resolvedCategoryCubit == null) {
+      try {
+        resolvedCategoryCubit = context.read<CategoryCubit>();
+      } catch (_) {}
+    }
+
+    AddonCubit? resolvedAddonCubit = addonCubit;
+    if (resolvedAddonCubit == null) {
+      try {
+        resolvedAddonCubit = context.read<AddonCubit>();
+      } catch (_) {}
+    }
+
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (ctx) => ProductFormDialog(
-        product: product,
-        onSave: onSave,
-        photoStorage: photoStorage,
-        imagePickerService: imagePickerService,
-      ),
+      builder: (ctx) {
+        final dialog = ProductFormDialog(
+          product: product,
+          onSave: onSave,
+          photoStorage: photoStorage,
+          imagePickerService: imagePickerService,
+        );
+
+        final providers = <BlocProvider>[];
+        if (resolvedCategoryCubit != null) {
+          providers.add(
+            BlocProvider<CategoryCubit>.value(value: resolvedCategoryCubit),
+          );
+        }
+        if (resolvedAddonCubit != null) {
+          providers.add(
+            BlocProvider<AddonCubit>.value(value: resolvedAddonCubit),
+          );
+        }
+
+        if (providers.isNotEmpty) {
+          return MultiBlocProvider(
+            providers: providers,
+            child: dialog,
+          );
+        }
+        return dialog;
+      },
     );
   }
 
@@ -425,42 +463,68 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceCard,
-                  borderRadius: AppRadius.borderRadiusMd,
-                  border: Border.all(
-                    color: AppColors.borderHairline,
-                    width: 1,
-                  ),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int?>(
-                    value: _selectedCategoryId,
-                    isExpanded: true,
-                    borderRadius: AppRadius.borderRadiusMd,
-                    items: [
-                      const DropdownMenuItem<int?>(
-                        value: null,
-                        child: Text(AppStrings.uncategorized),
-                      ),
-                      ...categories.map(
-                        (cat) => DropdownMenuItem<int?>(
+              Builder(
+                builder: (context) {
+                  final seenCategoryIds = <int?>{null};
+                  final categoryItems = <DropdownMenuItem<int?>>[
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text(AppStrings.uncategorized),
+                    ),
+                  ];
+                  for (final cat in categories) {
+                    if (seenCategoryIds.add(cat.id)) {
+                      categoryItems.add(
+                        DropdownMenuItem<int?>(
                           value: cat.id,
                           child: Text(cat.name),
                         ),
+                      );
+                    }
+                  }
+                  if (_selectedCategoryId != null &&
+                      !seenCategoryIds.contains(_selectedCategoryId)) {
+                    categoryItems.add(
+                      DropdownMenuItem<int?>(
+                        value: _selectedCategoryId,
+                        child: Text(
+                          widget.product?.categoryName != null &&
+                                  widget.product!.categoryName!.isNotEmpty
+                              ? widget.product!.categoryName!
+                              : 'Kategori ($_selectedCategoryId)',
+                        ),
                       ),
-                    ],
-                    onChanged: _isLoading
-                        ? null
-                        : (val) {
-                            setState(() {
-                              _selectedCategoryId = val;
-                            });
-                          },
-                  ),
-                ),
+                    );
+                  }
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceCard,
+                      borderRadius: AppRadius.borderRadiusMd,
+                      border: Border.all(
+                        color: AppColors.borderHairline,
+                        width: 1,
+                      ),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int?>(
+                        value: _selectedCategoryId,
+                        isExpanded: true,
+                        borderRadius: AppRadius.borderRadiusMd,
+                        items: categoryItems,
+                        onChanged: _isLoading
+                            ? null
+                            : (val) {
+                                setState(() {
+                                  _selectedCategoryId = val;
+                                });
+                              },
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.md),
 

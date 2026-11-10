@@ -26,9 +26,7 @@ lib/
     category/         # CRUD Kategori master dan filter produk
     addon/            # CRUD Add-on dengan stok dan harga tersendiri
     product/          # CRUD Produk lengkap, foto lokal offline, pivot product_addons
-      domain/         # Product entity, repository interface, use cases, ProductValidator
-      data/           # ProductModel, ProductLocalDataSource, ProductRepositoryImpl, PhotoStorage, ImagePickerService
-      presentation/   # ProductCubit, ProductState, ProductListView, ProductCard, dialogs
+    store_profile/    # Profil Toko, data contoh kopi & roti, dan Pengaturan sesi
     cashier/          # Keranjang & checkout
     transaction/      # Riwayat transaksi & snapshot nota
 ```
@@ -78,14 +76,21 @@ Foreign keys diaktifkan pada koneksi (`PRAGMA foreign_keys = ON` di `onConfigure
 
 ---
 
-## 5. Pengujian & Verifikasi
+## 5. Tab Pengaturan & Data Contoh
 
-Semua lapisan diuji dengan unit test dan widget test (206 test case passing):
-- Validasi domain (`ProductValidatorTest`): aturan nama, harga > 0, stok >= 0.
-- `PhotoStorageTest`: uji salin foto, resolusi path, penggantian/penghapusan file, dan penanganan file hilang tanpa crash.
-- `ProductRepositoryImplTest`: integrasi SQLite in-memory, verifikasi soft delete, pivot table add-on, filter kategori, pencarian, dan cascading `SET NULL` kategori.
-- `ProductCubitTest`: verifikasi transisi state, pencarian, filter, dan error handling.
-- `ProductPageTest`: pengujian widget tampilan grid, badge stok menipis, placeholder inisial foto, filter chip, dialog form, dan dialog konfirmasi soft delete.
+1. **Edit Profil Toko**: Menyimpan data nama toko, alamat, nomor telepon, dan pesan footer struk ke tabel `store_profile`. Data ini menjadi snapshot header dan footer saat transaksi dan cetak struk.
+2. **Sesi Kasir & Keluar**: Menampilkan informasi akun kasir aktif, waktu sesi dimulai, dan ID pengguna, disertai tombol keluar dengan dialog konfirmasi (`AppButtonVariant.destructive`).
+3. **Muat Data Contoh**: Tombol dengan dialog konfirmasi untuk memuat menu awal kedai kopi dan roti (3 kategori, 4 add-on, 5 produk realistis beserta relasi pivot `product_addons`, tanpa foto). Fitur ini memiliki proteksi atomik: hanya dapat memuat data jika katalog masih kosong, dan secara otomatis menolak duplikasi data bila tabel sudah berisi.
+
+---
+
+## 6. Pengujian & Verifikasi
+
+Semua lapisan diuji dengan unit test dan widget test (224 test case passing):
+- `StoreProfileValidatorTest` & `StoreProfileCubitTest`: validasi input form dan alur state loading, success, failure, serta notifikasi.
+- `StoreProfileRepositoryImplTest`: integrasi database in-memory untuk simpan dan baca profil toko, verifikasi persistence, serta jaminan seeding tidak menggandakan data saat tabel sudah berisi.
+- `SettingsPageTest` & `AppShellTest`: widget test layar pengaturan, prefill data profil, validasi inline pesan error, dialog konfirmasi muat data contoh, dan dialog konfirmasi keluar.
+- Validasi domain produk, add-on, kategori, sistem foto offline, dan autentikasi.
 
 Jalankan pengujian:
 ```bash

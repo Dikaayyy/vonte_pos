@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_button.dart';
 import '../../../../core/theme/app_card.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -14,7 +14,12 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../../features/auth/presentation/cubit/auth_state.dart';
+import '../../../../features/category/presentation/cubit/category_cubit.dart';
+import '../../../../features/addon/presentation/cubit/addon_cubit.dart';
+import '../../../../features/product/presentation/cubit/product_cubit.dart';
 import '../../../../features/product/presentation/pages/product_shell_page.dart';
+import '../../../../features/store_profile/presentation/cubit/store_profile_cubit.dart';
+import '../../../../features/store_profile/presentation/pages/settings_page.dart';
 import '../widgets/floating_glass_bottom_bar.dart';
 
 /// AppShell hosts the primary 4 destinations after authentication:
@@ -29,11 +34,22 @@ import '../widgets/floating_glass_bottom_bar.dart';
 ///
 /// Uses IndexedStack to guarantee tab states are preserved without rebuilding.
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, this.initialIndex = 0});
+  const AppShell({
+    super.key,
+    this.initialIndex = 0,
+    this.storeProfileCubit,
+    this.productCubit,
+    this.categoryCubit,
+    this.addonCubit,
+  });
 
   static const String routeName = AppRoutes.home;
 
   final int initialIndex;
+  final StoreProfileCubit? storeProfileCubit;
+  final ProductCubit? productCubit;
+  final CategoryCubit? categoryCubit;
+  final AddonCubit? addonCubit;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -69,7 +85,7 @@ class _AppShellState extends State<AppShell> {
     const CashierPlaceholderView(),
     const ProductShellPage(),
     const ReportPlaceholderView(),
-    const SettingsPlaceholderView(),
+    SettingsPage(storeProfileCubit: widget.storeProfileCubit),
   ];
 
   @override
@@ -83,11 +99,18 @@ class _AppShellState extends State<AppShell> {
     setState(() {
       _currentIndex = index;
     });
+    if (index == 1) {
+      try {
+        context.read<ProductCubit>().loadProducts();
+        context.read<CategoryCubit>().loadCategories();
+        context.read<AddonCubit>().loadAddons();
+      } catch (_) {}
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
+    Widget content = BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.unauthenticated) {
           Navigator.pushNamedAndRemoveUntil(
@@ -145,6 +168,58 @@ class _AppShellState extends State<AppShell> {
         },
       ),
     );
+
+    final providers = <BlocProvider>[];
+    if (widget.productCubit != null) {
+      providers.add(
+        BlocProvider<ProductCubit>.value(
+          value: widget.productCubit!..loadProducts(),
+        ),
+      );
+    } else if (getIt.isRegistered<ProductCubit>()) {
+      providers.add(
+        BlocProvider<ProductCubit>(
+          create: (_) => getIt<ProductCubit>()..loadProducts(),
+        ),
+      );
+    }
+
+    if (widget.categoryCubit != null) {
+      providers.add(
+        BlocProvider<CategoryCubit>.value(
+          value: widget.categoryCubit!..loadCategories(),
+        ),
+      );
+    } else if (getIt.isRegistered<CategoryCubit>()) {
+      providers.add(
+        BlocProvider<CategoryCubit>(
+          create: (_) => getIt<CategoryCubit>()..loadCategories(),
+        ),
+      );
+    }
+
+    if (widget.addonCubit != null) {
+      providers.add(
+        BlocProvider<AddonCubit>.value(
+          value: widget.addonCubit!..loadAddons(),
+        ),
+      );
+    } else if (getIt.isRegistered<AddonCubit>()) {
+      providers.add(
+        BlocProvider<AddonCubit>(
+          create: (_) => getIt<AddonCubit>()..loadAddons(),
+        ),
+      );
+    }
+
+    if (providers.isNotEmpty) {
+      return MultiBlocProvider(
+        providers: providers,
+        child: content,
+      );
+    }
+
+    return content;
   }
 
   Widget _buildNavigationRail() {
@@ -508,229 +583,4 @@ class ReportPlaceholderView extends StatelessWidget {
   }
 }
 
-/// Tab 4: Pengaturan Placeholder.
-/// Provides user session details and clean confirmation dialog for logout.
-class SettingsPlaceholderView extends StatelessWidget {
-  const SettingsPlaceholderView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: const _PlaceholderAppBar(
-        title: AppStrings.navSettings,
-        subtitle: AppStrings.settingsPlaceholderSubtitle,
-        icon: Icons.settings_rounded,
-      ),
-      body: SafeArea(
-        child: BlocBuilder<AuthCubit, AuthState>(
-          builder: (context, state) {
-            final user = state.user;
-            final dateFormatted = DateFormat('dd MMM yyyy, HH:mm').format(
-              DateTime.now(),
-            );
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.gutterCompact),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppCard(
-                        padding: const EdgeInsets.all(AppSpacing.xl),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: AppColors.primarySoft,
-                                  child: Text(
-                                    (user?.name.isNotEmpty ?? false)
-                                        ? user!.name[0].toUpperCase()
-                                        : 'K',
-                                    style: AppTypography.headlineMd.copyWith(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.lg),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user?.name ?? 'Kasir Vonte',
-                                        style: AppTypography.title.copyWith(
-                                          color: AppColors.onSurface,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        '@${user?.username ?? "kasir"}',
-                                        style: AppTypography.bodySm.copyWith(
-                                          color: AppColors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.sm,
-                                    vertical: AppSpacing.xs,
-                                  ),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.successSoft,
-                                    borderRadius: AppRadius.borderRadiusFull,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.success,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.xs),
-                                      Text(
-                                        AppStrings.activeSessionTitle,
-                                        style: AppTypography.caption.copyWith(
-                                          color: AppColors.success,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            const Divider(
-                              color: AppColors.borderHairline,
-                              height: 1,
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Waktu Sesi Dimulai',
-                                    style: AppTypography.bodySm.copyWith(
-                                      color: AppColors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Text(
-                                  dateFormatted,
-                                  style: AppTypography.bodySm.copyWith(
-                                    color: AppColors.onSurface,
-                                    fontWeight: FontWeight.w600,
-                                    fontFeatures: AppTypography.tabularFigures,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'ID Pengguna',
-                                    style: AppTypography.bodySm.copyWith(
-                                      color: AppColors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Text(
-                                  '#${user?.id ?? 0}',
-                                  style: AppTypography.bodySm.copyWith(
-                                    color: AppColors.onSurface,
-                                    fontWeight: FontWeight.w600,
-                                    fontFeatures: AppTypography.tabularFigures,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      AppButton(
-                        text: AppStrings.logout,
-                        variant: AppButtonVariant.destructive,
-                        leadingIcon: const Icon(
-                          Icons.logout_rounded,
-                          size: 20,
-                          color: AppColors.error,
-                        ),
-                        onPressed: () => _confirmLogout(context),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: const RoundedRectangleBorder(
-            borderRadius: AppRadius.borderRadiusXl,
-          ),
-          backgroundColor: AppColors.surfaceCard,
-          title: Text(
-            'Konfirmasi Keluar',
-            style: AppTypography.headlineMd.copyWith(
-              color: AppColors.onSurface,
-            ),
-          ),
-          content: Text(
-            'Apakah Anda yakin ingin mengakhiri sesi kasir ini?',
-            style: AppTypography.bodyMd.copyWith(
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                AppStrings.cancel,
-                style: AppTypography.label.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-            ),
-            AppButton(
-              text: AppStrings.logout,
-              variant: AppButtonVariant.destructive,
-              isSolidDestructive: true,
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context.read<AuthCubit>().logout();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-}

@@ -16,6 +16,7 @@ import 'package:vonte_pos/features/product/presentation/cubit/product_cubit.dart
 import 'package:vonte_pos/features/product/presentation/cubit/product_state.dart';
 import 'package:vonte_pos/features/product/presentation/pages/product_list_view.dart';
 import 'package:vonte_pos/features/product/presentation/pages/product_shell_page.dart';
+import 'package:vonte_pos/features/product/presentation/widgets/product_form_dialog.dart';
 
 class MockProductCubit extends Mock implements ProductCubit {}
 
@@ -238,6 +239,62 @@ void main() {
 
       // Validations triggered
       expect(find.text(AppStrings.productNameRequired), findsOneWidget);
+    });
+
+    testWidgets('tapping product card with categoryId opens edit dialog without crashing', (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          child: ProductListView(photoStorage: mockPhotoStorage),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap on product card for 'Kopi Susu Aren' (which has categoryId: 1)
+      await tester.tap(find.text('Kopi Susu Aren'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.editProduct), findsOneWidget);
+    });
+
+    testWidgets('edit dialog with unlisted categoryId falls back safely without assertion crash', (tester) async {
+      const productWithUnlistedCat = Product(
+        id: 99,
+        categoryId: 999,
+        categoryName: 'Kategori Lama',
+        name: 'Produk Tanpa Kategori Cocok',
+        price: 15000,
+        stock: 10,
+        photoPath: null,
+        addonIds: [],
+        createdAt: 1000,
+        updatedAt: 1000,
+      );
+
+      when(() => mockProductCubit.state).thenReturn(
+        const ProductState(
+          status: ProductStatus.success,
+          products: [productWithUnlistedCat],
+        ),
+      );
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          child: ProductListView(photoStorage: mockPhotoStorage),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Produk Tanpa Kategori Cocok'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppStrings.editProduct), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(ProductFormDialog),
+          matching: find.text('Kategori Lama'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('open delete dialog displays soft delete explanation and confirms', (tester) async {
