@@ -31,7 +31,7 @@ The developer must be able to explain the architecture, data flow, database sche
 Add with `flutter pub add <name>` so versions resolve to the latest compatible. Never copy version numbers from memory.
 
 - Runtime: `flutter_bloc`, `equatable`, `get_it`, `sqflite`, `path`, `path_provider`, `image_picker`, `crypto`, `intl`.
-- Dev: `flutter_test`, `bloc_test`, `mocktail`, `flutter_lints`.
+- Dev: `flutter_test`, `bloc_test`, `mocktail`, `flutter_lints`, `sqflite_common_ffi`.
 - Bonus, only when that feature is started: `fl_chart` (charts); a Bluetooth thermal printing package plus an ESC/POS helper (check that the package is actively maintained before choosing).
 
 Navigation: Flutter's built-in `Navigator` with named routes.
