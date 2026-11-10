@@ -16,6 +16,14 @@ import '../../features/category/domain/usecases/delete_category.dart';
 import '../../features/category/domain/usecases/get_categories.dart';
 import '../../features/category/domain/usecases/update_category.dart';
 import '../../features/category/presentation/cubit/category_cubit.dart';
+import '../../features/addon/data/datasources/addon_local_data_source.dart';
+import '../../features/addon/data/repositories/addon_repository_impl.dart';
+import '../../features/addon/domain/repositories/addon_repository.dart';
+import '../../features/addon/domain/usecases/create_addon.dart';
+import '../../features/addon/domain/usecases/delete_addon.dart';
+import '../../features/addon/domain/usecases/get_addons.dart';
+import '../../features/addon/domain/usecases/update_addon.dart';
+import '../../features/addon/presentation/cubit/addon_cubit.dart';
 import '../database/app_database.dart';
 
 final getIt = GetIt.instance;
@@ -39,6 +47,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => CategoryLocalDataSourceImpl(getIt<AppDatabase>()),
     );
   }
+  if (!getIt.isRegistered<AddonLocalDataSource>()) {
+    getIt.registerLazySingleton<AddonLocalDataSource>(
+      () => AddonLocalDataSourceImpl(getIt<AppDatabase>()),
+    );
+  }
 
   // 3. Repositories
   if (!getIt.isRegistered<AuthRepository>()) {
@@ -49,6 +62,11 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
   if (!getIt.isRegistered<CategoryRepository>()) {
     getIt.registerLazySingleton<CategoryRepository>(
       () => CategoryRepositoryImpl(getIt<CategoryLocalDataSource>()),
+    );
+  }
+  if (!getIt.isRegistered<AddonRepository>()) {
+    getIt.registerLazySingleton<AddonRepository>(
+      () => AddonRepositoryImpl(getIt<AddonLocalDataSource>()),
     );
   }
 
@@ -93,6 +111,26 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
       () => DeleteCategory(getIt<CategoryRepository>()),
     );
   }
+  if (!getIt.isRegistered<GetAddons>()) {
+    getIt.registerLazySingleton<GetAddons>(
+      () => GetAddons(getIt<AddonRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<CreateAddon>()) {
+    getIt.registerLazySingleton<CreateAddon>(
+      () => CreateAddon(getIt<AddonRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<UpdateAddon>()) {
+    getIt.registerLazySingleton<UpdateAddon>(
+      () => UpdateAddon(getIt<AddonRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<DeleteAddon>()) {
+    getIt.registerLazySingleton<DeleteAddon>(
+      () => DeleteAddon(getIt<AddonRepository>()),
+    );
+  }
 
   // 5. Cubits (Factory)
   if (!getIt.isRegistered<AuthCubit>()) {
@@ -112,6 +150,16 @@ Future<void> initDependencies({AppDatabase? appDatabase}) async {
         createCategoryUseCase: getIt<CreateCategory>(),
         updateCategoryUseCase: getIt<UpdateCategory>(),
         deleteCategoryUseCase: getIt<DeleteCategory>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<AddonCubit>()) {
+    getIt.registerFactory<AddonCubit>(
+      () => AddonCubit(
+        getAddonsUseCase: getIt<GetAddons>(),
+        createAddonUseCase: getIt<CreateAddon>(),
+        updateAddonUseCase: getIt<UpdateAddon>(),
+        deleteAddonUseCase: getIt<DeleteAddon>(),
       ),
     );
   }

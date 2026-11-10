@@ -138,4 +138,32 @@ abstract final class AppStrings {
       'Katalog produk utama akan aktif pada slice produk.';
   static const String addonCatalogPlaceholder =
       'Daftar add-on akan aktif pada slice add-on.';
+
+  // Add-on Management
+  static const String addonListTitle = 'Daftar Add-on';
+  static const String addonListSubtitle =
+      'Kelola topping dan pilihan tambahan untuk produk toko.';
+  static const String addAddon = 'Tambah Add-on';
+  static const String editAddon = 'Ubah Add-on';
+  static const String deleteAddon = 'Hapus Add-on';
+  static const String addonNameLabel = 'Nama Add-on';
+  static const String addonNameHint = 'Contoh: Extra Shot';
+  static const String addonPriceLabel = 'Harga Tambahan (Rp)';
+  static const String addonPriceHint = '0 untuk gratis';
+  static const String addonStockLabel = 'Stok Sendiri';
+  static const String addonStockHint = 'Contoh: 20';
+  static const String addonNameRequired = 'Nama add-on tidak boleh kosong.';
+  static const String addonPriceInvalid = 'Harga tambahan harus 0 atau lebih.';
+  static const String addonPriceNan = 'Harga tambahan harus berupa angka valid.';
+  static const String addonStockInvalid = 'Stok harus 0 atau lebih.';
+  static const String addonStockNan = 'Stok harus berupa angka valid.';
+  static const String deleteAddonConfirmTitle = 'Hapus Add-on?';
+  static const String deleteAddonConfirmMessage =
+      'Add-on ini akan dihapus dari daftar master dan kasir, tetapi tetap tersimpan untuk riwayat transaksi.';
+  static const String emptyAddonTitle = 'Belum ada add-on';
+  static const String emptyAddonSubtitle =
+      'Tambahkan topping atau pilihan tambahan untuk produk toko.';
+  static const String outOfStockBadge = 'Habis';
+  static const String freePriceLabel = 'Gratis';
+  static const String stockLabelPrefix = 'Stok:';
 }

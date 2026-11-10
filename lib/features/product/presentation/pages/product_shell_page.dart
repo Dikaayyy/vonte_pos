@@ -12,15 +12,19 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../category/presentation/cubit/category_cubit.dart';
 import '../../../category/presentation/pages/category_list_view.dart';
+import '../../../addon/presentation/cubit/addon_cubit.dart';
+import '../../../addon/presentation/pages/addon_list_view.dart';
 
 class ProductShellPage extends StatefulWidget {
   final int initialSubIndex;
   final CategoryCubit? categoryCubit;
+  final AddonCubit? addonCubit;
 
   const ProductShellPage({
     super.key,
     this.initialSubIndex = 1, // Defaults to Kategori for immediate evaluation
     this.categoryCubit,
+    this.addonCubit,
   });
 
   @override
@@ -191,25 +195,56 @@ class _ProductShellPageState extends State<ProductShellPage> {
                 }
               },
             ),
-            _buildPlaceholder(
-              title: AppStrings.addonTabLabel,
-              subtitle: AppStrings.addonCatalogPlaceholder,
-              icon: Icons.add_circle_outline_rounded,
+            Builder(
+              builder: (ctx) {
+                try {
+                  ctx.read<AddonCubit>();
+                  return const AddonListView();
+                } catch (_) {
+                  return _buildPlaceholder(
+                    title: AppStrings.addonTabLabel,
+                    subtitle: AppStrings.addonCatalogPlaceholder,
+                    icon: Icons.add_circle_outline_rounded,
+                  );
+                }
+              },
             ),
           ],
         ),
       );
 
+    final providers = <BlocProvider>[];
     if (widget.categoryCubit != null) {
-      return BlocProvider<CategoryCubit>.value(
-        value: widget.categoryCubit!..loadCategories(),
-        child: content,
+      providers.add(
+        BlocProvider<CategoryCubit>.value(
+          value: widget.categoryCubit!..loadCategories(),
+        ),
+      );
+    } else if (getIt.isRegistered<CategoryCubit>()) {
+      providers.add(
+        BlocProvider<CategoryCubit>(
+          create: (context) => getIt<CategoryCubit>()..loadCategories(),
+        ),
       );
     }
 
-    if (getIt.isRegistered<CategoryCubit>()) {
-      return BlocProvider<CategoryCubit>(
-        create: (context) => getIt<CategoryCubit>()..loadCategories(),
+    if (widget.addonCubit != null) {
+      providers.add(
+        BlocProvider<AddonCubit>.value(
+          value: widget.addonCubit!..loadAddons(),
+        ),
+      );
+    } else if (getIt.isRegistered<AddonCubit>()) {
+      providers.add(
+        BlocProvider<AddonCubit>(
+          create: (context) => getIt<AddonCubit>()..loadAddons(),
+        ),
+      );
+    }
+
+    if (providers.isNotEmpty) {
+      return MultiBlocProvider(
+        providers: providers,
         child: content,
       );
     }
